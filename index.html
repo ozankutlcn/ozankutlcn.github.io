@@ -1,47 +1,262 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Reminder - Official Site</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #0f172a;
-            color: #f8fafc;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            text-align: center;
-        }
-        .card {
-            background-color: #1e293b;
-            padding: 2.5rem;
-            border-radius: 1rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            max-width: 480px;
-            margin: 1rem;
-        }
-        h1 { margin-top: 0; font-size: 1.8rem; color: #60a5fa; }
-        p { color: #94a3b8; line-height: 1.6; }
-        a {
-            display: inline-block;
-            margin-top: 1rem;
-            color: #38bdf8;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        a:hover { text-decoration: underline; }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Smart Reminder — AI Voice Reminder App</title>
+<link rel="icon" type="image/png" href="icon.png" />
+<link rel="apple-touch-icon" href="icon.png" />
+<meta property="og:image" content="icon.png" />
+<meta property="og:title" content="Smart Reminder — AI Voice Reminder App" />
+<meta name="description" content="Smart Reminder is an intelligent voice-powered reminder app. Speak naturally in Turkish, English, Spanish or German and let AI schedule everything for you." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#0B0C15;
+    --surface:#161827;
+    --surface-2:#1E2035;
+    --primary:#3B82F6;
+    --primary-light:#60A5FA;
+    --secondary:#D946EF;
+    --accent:#8B5CF6;
+    --text:#FFFFFF;
+    --text-dim:#B0B0B0;
+    --radius:22px;
+    --maxw:1120px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    line-height:1.6;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.brand{font-family:'Sora','Inter',sans-serif;letter-spacing:-.02em}
+
+  /* animated aurora background */
+  .aurora{position:fixed;inset:0;z-index:-2;overflow:hidden}
+  .aurora span{
+    position:absolute;border-radius:50%;filter:blur(90px);opacity:.55;
+    animation:float 22s ease-in-out infinite;
+  }
+  .aurora span:nth-child(1){width:520px;height:520px;background:var(--primary);top:-120px;left:-100px}
+  .aurora span:nth-child(2){width:460px;height:460px;background:var(--secondary);bottom:-140px;right:-120px;animation-delay:-7s}
+  .aurora span:nth-child(3){width:400px;height:400px;background:var(--accent);top:40%;left:55%;animation-delay:-13s}
+  @keyframes float{
+    0%,100%{transform:translate(0,0) scale(1)}
+    33%{transform:translate(60px,-50px) scale(1.12)}
+    66%{transform:translate(-40px,40px) scale(.92)}
+  }
+  .grid-overlay{position:fixed;inset:0;z-index:-1;
+    background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+    background-size:64px 64px;mask-image:radial-gradient(ellipse at 50% 0%,#000 30%,transparent 75%)}
+
+  /* layout */
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  header{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(11,12,21,.55);border-bottom:1px solid rgba(255,255,255,.06)}
+  nav{display:flex;align-items:center;justify-content:space-between;height:70px;max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.15rem}
+  .brand .logo{width:34px;height:34px;border-radius:10px;box-shadow:0 0 24px rgba(59,130,246,.45)}
+  @keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.5}}
+  nav .links{display:flex;gap:28px;align-items:center}
+  nav a{color:var(--text-dim);text-decoration:none;font-size:.92rem;transition:color .2s}
+  nav a:hover{color:#fff}
+  .btn{
+    display:inline-flex;align-items:center;gap:9px;padding:13px 24px;border-radius:999px;
+    font-weight:600;font-size:.95rem;text-decoration:none;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(135deg,var(--primary),var(--accent));
+    box-shadow:0 10px 30px rgba(59,130,246,.35);transition:transform .2s,box-shadow .2s;
+  }
+  .btn:hover{transform:translateY(-2px);box-shadow:0 16px 40px rgba(139,92,246,.45)}
+  .btn.ghost{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);box-shadow:none}
+
+  /* reveal on scroll */
+  .reveal{opacity:0;transform:translateY(34px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+
+  /* hero */
+  .hero{padding:90px 0 70px;text-align:center;position:relative}
+  .pill{display:inline-flex;align-items:center;gap:8px;padding:7px 16px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);font-size:.82rem;color:var(--text-dim);margin-bottom:26px}
+  .pill i{width:7px;height:7px;border-radius:50%;background:#10B981;box-shadow:0 0 10px #10B981}
+  .hero h1{font-size:clamp(2.3rem,6vw,4rem);font-weight:800;line-height:1.1;margin-bottom:22px}
+  .hero h1 .grad{background:linear-gradient(120deg,var(--primary-light),var(--secondary),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p.lead{max-width:640px;margin:0 auto 34px;color:var(--text-dim);font-size:1.1rem}
+  .cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+  /* mic visual */
+  .mic-stage{margin:60px auto 0;width:170px;height:170px;position:relative;display:grid;place-items:center}
+  .mic-stage .ring{position:absolute;inset:0;border-radius:50%;border:1px solid rgba(59,130,246,.4);animation:ripple 3s ease-out infinite}
+  .mic-stage .ring:nth-child(2){animation-delay:1s}
+  .mic-stage .ring:nth-child(3){animation-delay:2s}
+  @keyframes ripple{0%{transform:scale(.6);opacity:.9}100%{transform:scale(1.6);opacity:0}}
+  .mic-core{width:110px;height:110px;border-radius:26px;display:grid;place-items:center;box-shadow:0 0 55px rgba(139,92,246,.55);animation:bob 4s ease-in-out infinite}
+  .mic-core img{width:110px;height:110px;border-radius:26px;display:block}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  .eq{display:flex;gap:5px;align-items:flex-end;height:34px;margin-top:22px;justify-content:center}
+  .eq span{width:5px;background:linear-gradient(var(--primary-light),var(--secondary));border-radius:3px;animation:eq 1.1s ease-in-out infinite}
+  .eq span:nth-child(1){animation-delay:-.9s}
+  .eq span:nth-child(2){animation-delay:-.7s}
+  .eq span:nth-child(3){animation-delay:-.5s}
+  .eq span:nth-child(4){animation-delay:-.3s}
+  .eq span:nth-child(5){animation-delay:-.1s}
+  .eq span:nth-child(6){animation-delay:-.6s}
+  .eq span:nth-child(7){animation-delay:-.4s}
+  @keyframes eq{0%,100%{height:8px}50%{height:34px}}
+
+  /* sections */
+  section.block{padding:80px 0}
+  .sec-head{text-align:center;max-width:620px;margin:0 auto 54px}
+  .sec-head h2{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:800;margin-bottom:14px}
+  .sec-head p{color:var(--text-dim)}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px}
+  .card{
+    background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02));
+    border:1px solid rgba(255,255,255,.09);border-radius:var(--radius);padding:28px;
+    backdrop-filter:blur(10px);transition:transform .3s,border-color .3s;position:relative;overflow:hidden;
+  }
+  .card:hover{transform:translateY(-6px);border-color:rgba(96,165,250,.5)}
+  .card .ico{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;font-size:1.5rem;margin-bottom:18px;background:linear-gradient(135deg,rgba(59,130,246,.25),rgba(217,70,239,.25));border:1px solid rgba(255,255,255,.12)}
+  .card h3{font-size:1.15rem;margin-bottom:8px}
+  .card p{color:var(--text-dim);font-size:.94rem}
+
+  /* steps */
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:22px;counter-reset:s}
+  .step{padding:26px;border-radius:var(--radius);background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);position:relative}
+  .step::before{counter-increment:s;content:counter(s);position:absolute;top:-16px;left:22px;width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--primary),var(--accent));display:grid;place-items:center;font-weight:800;font-family:'Sora'}
+  .step h3{margin:14px 0 6px;font-size:1.05rem}
+  .step p{color:var(--text-dim);font-size:.92rem}
+
+  .langs{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+  .lang{padding:10px 20px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);font-size:.9rem}
+
+  /* CTA band */
+  .cta-band{margin:20px auto;max-width:var(--maxw);border-radius:30px;padding:56px 28px;text-align:center;
+    background:linear-gradient(135deg,rgba(59,130,246,.18),rgba(217,70,239,.18));border:1px solid rgba(255,255,255,.12);position:relative;overflow:hidden}
+  .cta-band h2{font-size:clamp(1.7rem,4vw,2.4rem);margin-bottom:14px}
+  .cta-band p{color:var(--text-dim);margin-bottom:28px}
+
+  footer{border-top:1px solid rgba(255,255,255,.07);padding:44px 0;margin-top:40px}
+  .foot{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px}
+  .foot .brand{font-size:1rem}
+  .foot nav{display:flex;gap:22px;height:auto;padding:0}
+  .foot a{color:var(--text-dim);text-decoration:none;font-size:.9rem;transition:color .2s}
+  .foot a:hover{color:#fff}
+  .copyright{color:var(--text-dim);font-size:.82rem;margin-top:18px;text-align:center}
+
+  @media(max-width:720px){
+    nav .links a:not(.btn){display:none}
+    .foot{flex-direction:column;text-align:center}
+  }
+</style>
 </head>
 <body>
-    <div class="card">
-        <h1>AI Reminder</h1>
-        <p>Your day. Perfectly remembered.</p>
-        <p>Geliştirici: Ozan Kutlucan<br>İletişim: ozankutlucan.dev@gmail.com</p>
-        <a href="https://ozankutlcn.github.io/ai-reminder-privacy-policy/">Gizlilik Politikası (Privacy Policy)</a>
+<div class="aurora"><span></span><span></span><span></span></div>
+<div class="grid-overlay"></div>
+
+<header>
+  <nav>
+    <div class="brand"><img class="logo" src="icon.png" alt="Smart Reminder logo" /> Smart Reminder</div>
+    <div class="links">
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#languages">Languages</a>
+      <a class="btn ghost" href="https://ozankutlcn.github.io/ai-reminder-privacy-policy/" target="_blank" rel="noopener">Privacy Policy</a>
     </div>
+  </nav>
+</header>
+
+<main>
+  <section class="hero wrap">
+    <span class="pill reveal"><i></i> AI-powered · Voice-first · Offline-ready</span>
+    <h1 class="reveal">Just say it.<br /><span class="grad">Smart Reminder</span> handles the rest.</h1>
+    <p class="lead reveal">An intelligent voice-based reminder app that understands natural language. Speak like you normally would — <em>"remind me to take my medicine in 2 hours"</em> — and AI figures out the time, category and notifications automatically.</p>
+    <div class="cta-row reveal">
+      <a class="btn" href="#features">Explore features</a>
+      <a class="btn ghost" href="https://ozankutlcn.github.io/ai-reminder-privacy-policy/" target="_blank" rel="noopener">Read our Privacy Policy</a>
+    </div>
+
+    <div class="mic-stage reveal">
+      <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+      <div class="mic-core"><img src="icon.png" alt="Smart Reminder app icon" /></div>
+    </div>
+    <div class="eq reveal"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  </section>
+
+  <section class="block wrap" id="features">
+    <div class="sec-head reveal">
+      <h2>Built to understand you</h2>
+      <p>Natural language processing, smart scheduling and text-to-speech notifications that reach you even when the app is closed.</p>
+    </div>
+    <div class="cards">
+      <div class="card reveal"><div class="ico">🎙️</div><h3>Natural voice input</h3><p>Speak conversationally. No rigid commands, no forms — the parser extracts the task, date and time for you.</p></div>
+      <div class="card reveal"><div class="ico">🧠</div><h3>AI date &amp; time</h3><p>"Tomorrow morning", "next week", "3 days from now" — all calculated intelligently and precisely.</p></div>
+      <div class="card reveal"><div class="ico">🔔</div><h3>Multi-stage alerts</h3><p>Early warnings at 15 and 5 minutes, an exact-time notification, and a late alert if you miss it.</p></div>
+      <div class="card reveal"><div class="ico">🗣️</div><h3>Text-to-speech</h3><p>Reminders are read aloud in your language when the scheduled time arrives.</p></div>
+      <div class="card reveal"><div class="ico">🏷️</div><h3>Auto categories</h3><p>Health, work, personal and education reminders are sorted automatically as you speak.</p></div>
+      <div class="card reveal"><div class="ico">🔁</div><h3>Recurring &amp; special dates</h3><p>"Every Monday", birthdays and anniversaries — set once, remembered forever.</p></div>
+      <div class="card reveal"><div class="ico">📅</div><h3>Calendar sync</h3><p>Reminders and special dates can be added to your device calendar automatically.</p></div>
+      <div class="card reveal"><div class="ico">🔒</div><h3>Secret notes</h3><p>Private notes protected with biometric authentication, stored securely on your device.</p></div>
+    </div>
+  </section>
+
+  <section class="block wrap" id="how">
+    <div class="sec-head reveal">
+      <h2>Three steps, zero friction</h2>
+      <p>From spoken sentence to scheduled notification in seconds.</p>
+    </div>
+    <div class="steps">
+      <div class="step reveal"><h3>Speak</h3><p>Tap the mic and say what you need to remember in your own words.</p></div>
+      <div class="step reveal"><h3>AI parses</h3><p>The engine detects the task, time, category and whether it repeats.</p></div>
+      <div class="step reveal"><h3>Get reminded</h3><p>Notifications and spoken alerts reach you on time — even with the app closed.</p></div>
+    </div>
+  </section>
+
+  <section class="block wrap" id="languages">
+    <div class="sec-head reveal">
+      <h2>Speaks your language</h2>
+      <p>Natural language understanding and text-to-speech in four languages.</p>
+    </div>
+    <div class="langs reveal">
+      <span class="lang">🇹🇷 Türkçe</span>
+      <span class="lang">🇬🇧 English</span>
+      <span class="lang">🇪🇸 Español</span>
+      <span class="lang">🇩🇪 Deutsch</span>
+    </div>
+  </section>
+
+  <section class="cta-band reveal">
+    <h2>Your reminders, your privacy</h2>
+    <p>Data stays on your device. Read exactly what we collect and how we handle it.</p>
+    <a class="btn" href="https://ozankutlcn.github.io/ai-reminder-privacy-policy/" target="_blank" rel="noopener">Open Privacy Policy →</a>
+  </section>
+</main>
+
+<footer class="wrap">
+  <div class="foot">
+    <div class="brand"><img class="logo" src="icon.png" alt="Smart Reminder logo" /> Smart Reminder</div>
+    <nav>
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="https://ozankutlcn.github.io/ai-reminder-privacy-policy/" target="_blank" rel="noopener">Privacy Policy</a>
+    </nav>
+  </div>
+  <p class="copyright">© <span id="yr"></span> Smart Reminder — Voice-powered reminder app. All rights reserved.</p>
+</footer>
+
+<script>
+  document.getElementById('yr').textContent = new Date().getFullYear();
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }});
+  },{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(function(el,i){
+    el.style.transitionDelay = (i % 6 * 60) + 'ms';
+    io.observe(el);
+  });
+</script>
 </body>
 </html>
